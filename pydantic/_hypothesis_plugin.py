@@ -327,7 +327,7 @@ def resolve_conint(cls):  # type: ignore[no-untyped-def]
     return st.integers(min_value, max_value).map(lambda x: x * cls.multiple_of)
 
 
-@resolves(pydantic.ConstrainedDate)
+#@resolves(pydantic.ConstrainedDate)
 def resolve_condate(cls):  # type: ignore[no-untyped-def]
     min_value = cls.ge
     max_value = cls.le
@@ -346,7 +346,7 @@ def resolve_condate(cls):  # type: ignore[no-untyped-def]
     return s
 
 
-#@resolves(pydantic.ConstrainedStr)
+@resolves(pydantic.ConstrainedStr)
 def resolve_constr(cls):  # type: ignore[no-untyped-def]  # pragma: no cover
     min_size = cls.min_length or 0
     max_size = cls.max_length
