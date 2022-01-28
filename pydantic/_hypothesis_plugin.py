@@ -165,6 +165,8 @@ st.register_type_strategy(
 st.register_type_strategy(pydantic.StrictBool, st.booleans())
 st.register_type_strategy(pydantic.StrictStr, st.text())
 
+st.register_type_strategy(pydantic.ConstrainedDate, st.dates())
+
 
 # Constrained-type resolver functions
 #
@@ -335,6 +337,7 @@ def resolve_condate(cls):  # type: ignore[no-untyped-def]
     if cls.lt is not None:
         assert max_value is None, 'Set `lt` or `le`, but not both'
         max_value = cls.lt
+        breakpoint()
     s = st.dates(min_value, max_value)
     if cls.lt is not None:
         s = s.filter(lambda d: d < cls.lt)
@@ -343,7 +346,7 @@ def resolve_condate(cls):  # type: ignore[no-untyped-def]
     return s
 
 
-@resolves(pydantic.ConstrainedStr)
+#@resolves(pydantic.ConstrainedStr)
 def resolve_constr(cls):  # type: ignore[no-untyped-def]  # pragma: no cover
     min_size = cls.min_length or 0
     max_size = cls.max_length

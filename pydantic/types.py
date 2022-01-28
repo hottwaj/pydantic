@@ -1121,7 +1121,19 @@ else:
 
             return value
 
-    class ConstrainedDate(datetime.date, metaclass = ConstrainedNumberMeta):
+
+    class ConstrainedDateMeta(type):
+        def __new__(cls, name: str, bases: Any, dct: Dict[str, Any]) -> 'ConstrainedDate':  # type: ignore
+            new_cls = cast('ConstrainedDate', type.__new__(cls, name, bases, dct))
+
+            if new_cls.gt is not None and new_cls.ge is not None:
+                raise errors.ConfigError('bounds gt and ge cannot be specified at the same time')
+            if new_cls.lt is not None and new_cls.le is not None:
+                raise errors.ConfigError('bounds lt and le cannot be specified at the same time')
+
+            return new_cls  # type: ignore
+
+    class ConstrainedDate(datetime.date, metaclass = ConstrainedDateMeta):
         strict_formats: Optional[List[str]] = None
         gt: OptionalDate = None
         ge: OptionalDate = None
@@ -1160,7 +1172,7 @@ else:
 
     def condate(
             *,
-            strict_formats: Optional[List[str]] = None,
+            strict_formats: List[str] = None,
             gt: datetime.date = None,
             ge: datetime.date = None,
             lt: datetime.date = None,
@@ -1168,4 +1180,4 @@ else:
     ) -> Type[datetime.date]:
         # use kwargs then define conf in a dict to aid with IDE type hinting
         namespace = dict(strict_formats = strict_formats, gt = gt, ge = ge, lt = lt, le = le)
-        return type('ConstrainedDateValue', (ConstrainedDate,), namespace)
+        return _registered(type('ConstrainedDateValue', (ConstrainedDate,), namespace))
